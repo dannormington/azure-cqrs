@@ -1,0 +1,2 @@
+AzureSimpleCQRS
+===============
