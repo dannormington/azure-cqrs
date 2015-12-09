@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Domain\AggregateRoot.cs" />
     <Compile Include="Domain\Attendee.cs" />
+    <Compile Include="Domain\IAggregateRoot.cs" />
     <Compile Include="Events\AttendeeChangeEmailConfirmed.cs" />
     <Compile Include="Events\AttendeeEmailChanged.cs" />
     <Compile Include="Infrastructure\Event.cs" />

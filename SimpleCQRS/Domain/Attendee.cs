@@ -1,10 +1,5 @@
 ﻿using SimpleCQRS.Events;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCQRS.Domain
 {
@@ -19,6 +14,7 @@ namespace SimpleCQRS.Domain
         {
             this.ApplyChange(new AttendeeRegistered(id, email));
         }
+
 
         public void ChangeEmailAddress(string newEmail) 
         {

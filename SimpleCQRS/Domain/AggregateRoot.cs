@@ -1,53 +1,15 @@
 ﻿using SimpleCQRS.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCQRS.Domain
 {
-    /// <summary>
-    /// Interface to an aggregate root
-    /// </summary>
-    public interface IAggregateRoot
-    {
-        /// <summary>
-        /// Aggregate Id
-        /// </summary>
-        Guid Id { get; }
-
-        /// <summary>
-        /// Get all changes
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<IEvent> GetUncommittedChanges();
-
-        /// <summary>
-        /// Mark the changes a committed
-        /// </summary>
-        void MarkChangesAsCommitted();
-
-        /// <summary>
-        /// Hydrate the aggregate
-        /// </summary>
-        /// <param name="history"></param>
-        void LoadFromHistory(IEnumerable<IEvent> history);
-
-        /// <summary>
-        /// Get the current version of the aggregate
-        /// </summary>
-        int CurrentVersion { get; }
-    }
-
     /// <summary>
     /// Aggregate root implementation
     /// </summary>
     public abstract class AggregateRoot : IAggregateRoot
     {
-        #region Properties
-
         /// <summary>
         /// List of changes to the aggregate
         /// </summary>
@@ -62,10 +24,6 @@ namespace SimpleCQRS.Domain
         /// Current version of the aggregate
         /// </summary>
         private int _currentVersion;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Constructor
@@ -83,10 +41,6 @@ namespace SimpleCQRS.Domain
             : this(Guid.NewGuid())
         {
         }
-
-        #endregion
-
-        #region Apply Change methods
 
         /// <summary>
         /// Apply the change
@@ -119,10 +73,6 @@ namespace SimpleCQRS.Domain
             if (isNew) _changes.Add(@event);
         }
 
-        #endregion
-
-        #region IAggregateRoot Members
-
         IEnumerable<IEvent> IAggregateRoot.GetUncommittedChanges()
         {
             return _changes;
@@ -152,7 +102,5 @@ namespace SimpleCQRS.Domain
         {
             get { return _currentVersion; }
         }
-
-        #endregion
     }
 }

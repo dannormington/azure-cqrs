@@ -24,6 +24,6 @@ namespace SimpleCQRS.Infrastructure
         /// </summary>
         /// <param name="aggregateId"></param>
         /// <returns></returns>
-        List<IEvent> GetEvents(Guid aggregateId);
+        IEnumerable<IEvent> GetEvents(Guid aggregateId);
     }
 }

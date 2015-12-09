@@ -1,11 +1,6 @@
 ﻿using SimpleCQRS.Events;
 using SimpleCQRS.Infrastructure;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCQRS.Handlers
 {

@@ -1,14 +1,10 @@
-﻿using Microsoft.ServiceBus;
-using Microsoft.ServiceBus.Messaging;
-using Microsoft.WindowsAzure;
+﻿using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure
 {
@@ -67,7 +63,7 @@ namespace SimpleCQRS.Infrastructure
         /// </summary>
         /// <param name="aggregateId"></param>
         /// <returns></returns>
-        public List<IEvent> GetEvents(Guid aggregateId)
+        public IEnumerable<IEvent> GetEvents(Guid aggregateId)
         {
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var tableClient = storageAccount.CreateCloudTableClient();

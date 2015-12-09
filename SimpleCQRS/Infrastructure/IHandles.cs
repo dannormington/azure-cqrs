@@ -1,11 +1,4 @@
-﻿using SimpleCQRS.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SimpleCQRS.Infrastructure
+﻿namespace SimpleCQRS.Infrastructure
 {
     /// <summary>
     /// Interface for handling messages
