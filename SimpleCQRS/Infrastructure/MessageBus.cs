@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Microsoft.Azure;
+using Microsoft.Practices.Unity;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
 using Newtonsoft.Json;
@@ -12,44 +13,56 @@ using System.Threading.Tasks;
 namespace SimpleCQRS.Infrastructure
 {
     /// <summary>
-    /// Simple event bus implementation
+    /// Simple message bus implementation
     /// </summary>
-    public class EventBus : IEventBus
+    public class MessageBus : IMessageBus
     {
-        private readonly UnityContainer _unityContainer = new UnityContainer();
+        /// <summary>
+        /// instance of unity container
+        /// </summary>
+        private readonly IUnityContainer _unityContainer;
+
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="unityContainer"></param>
+        public MessageBus(IUnityContainer unityContainer)
+        {
+            _unityContainer = unityContainer;
+        }
 
         void IDisposable.Dispose()
         {
             _unityContainer.Dispose();
         }
 
-        void IEventBus.RegisterEventHandler<TEvent, TImplementation>()
+        void IMessageBus.RegisterHandler<TEvent, TImplementation>()
         {
             var name = string.Format("{0}_{1}", typeof(TImplementation).Name, typeof(TEvent).Name);
             _unityContainer.RegisterType<IHandles<TEvent>, TImplementation>(name);
         }
 
-        Task IEventBus.PublishAsync<T>(T @event)
+        Task IMessageBus.PublishAsync<T>(T @event)
         {
             return PublishAsync(@event);
         }
 
-        Task IEventBus.PublishAsync(object @event)
+        Task IMessageBus.PublishAsync(object @event)
         {
             return PublishAsync(@event);
         }
 
-        void IEventBus.Publish<T>(T @event)
+        void IMessageBus.Publish<T>(T @event)
         {
             Publish(@event);
         }
 
-        void IEventBus.Publish(object @event)
+        void IMessageBus.Publish(object @event)
         {
             Publish(@event);
         }
 
-        void IEventBus.Publish<T>(IEnumerable<T> events)
+        void IMessageBus.Publish<T>(IEnumerable<T> events)
         {
             if (@events != null && @events.Any()) 
             {
@@ -60,9 +73,14 @@ namespace SimpleCQRS.Infrastructure
             }
         }
 
-        Task IEventBus.PublishToQueueAsync<T>(IEnumerable<T> events)
+        Task IMessageBus.PublishToQueueAsync<T>(IEnumerable<T> events)
         {
             return PublishToQueueAsync(events);
+        }
+
+        void IMessageBus.Send<T>(T command)
+        {
+            Send(command);
         }
 
         /// <summary>
@@ -169,6 +187,42 @@ namespace SimpleCQRS.Infrastructure
             await Task.WhenAll(tasks);
 
             messageSender.Close();
+        }
+
+        private void Send<T>(T command)
+            where T : class, ICommand
+        {
+            if (command == null)
+                return;
+
+            //Get a instance of the generic handler's type
+            Type genericType = typeof(IHandles<>);
+
+            //Get and instance of the messages type
+            Type myType = genericType.MakeGenericType(command.GetType());
+
+            //Get a list of all the handlers for this message type
+            var handlers = _unityContainer.ResolveAll(myType);
+
+            if (handlers != null && handlers.Any())
+            {
+                if (handlers.Count() > 1)
+                {
+                    Trace.WriteLine("A command should only have one handler.");
+                    return;
+                }
+
+                try
+                {
+                    var handler = handlers.First();
+                    myType.InvokeMember("Handle", BindingFlags.InvokeMethod, null, handler, new[] { command });
+                }
+                catch
+                {
+                    //push the message to an error queue identifying which handler failed
+                    Trace.WriteLine(string.Format("Exception handling {0}", command.GetType().FullName));
+                }
+            }
         }
     }
 }

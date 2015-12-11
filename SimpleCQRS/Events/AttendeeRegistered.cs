@@ -7,8 +7,8 @@ namespace SimpleCQRS.Events
     {
         public readonly string Email;
 
-        public AttendeeRegistered(Guid id, string email)
-            : base(id)
+        public AttendeeRegistered(Guid attendeeId, string email)
+            : base(attendeeId)
         {
             this.Email = email;
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace SimpleCQRS.Infrastructure
 {
@@ -10,13 +11,14 @@ namespace SimpleCQRS.Infrastructure
         /// <summary>
         /// The aggregate Id
         /// </summary>
+        [JsonProperty] //Had to add this because base class readonly properties weren't getting deserialized
         public readonly Guid Id;
 
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="id"></param>
-        protected Event(Guid id) 
+        public Event(Guid id) 
         {
             this.Id = id;
         }

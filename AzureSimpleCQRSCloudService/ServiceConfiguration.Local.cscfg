@@ -6,6 +6,15 @@
       <Setting name="Microsoft.ServiceBus.ConnectionString" value="[enter endpoint, shared access key name, and shared access key]" />
       <Setting name="Microsoft.ServiceBus.EventQueue" value="events" />
       <Setting name="Microsoft.WindowsAzure.Storage.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+    </ConfigurationSettings>
+  </Role>
+  <Role name="SimpleCQRSWebRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="[enter endpoint, shared access key name, and shared access key]" />
+      <Setting name="Microsoft.ServiceBus.EventQueue" value="events" />      
+      <Setting name="Microsoft.WindowsAzure.Storage.ConnectionString" value="UseDevelopmentStorage=true" />
       <Setting name="Microsoft.WindowsAzure.Storage.EventStoreTable" value="eventstore" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>

@@ -1,12 +1,7 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SimpleCQRS.Infrastructure
+namespace SimpleCQRS.Infrastructure.Persistence
 {
     /// <summary>
     /// Entity representation of an event
@@ -23,7 +18,7 @@ namespace SimpleCQRS.Infrastructure
         /// </summary>
         /// <param name="event"></param>
         /// <param name="version"></param>
-        public EventEntity(IEvent @event, int version) 
+        public EventEntity(IEvent @event, int version)
         {
             this.PartitionKey = @event.Id.ToString();
             this.RowKey = version.ToString();

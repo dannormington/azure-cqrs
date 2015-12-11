@@ -15,7 +15,6 @@ namespace SimpleCQRS.Domain
             this.ApplyChange(new AttendeeRegistered(id, email));
         }
 
-
         public void ChangeEmailAddress(string newEmail) 
         {
             if (string.IsNullOrEmpty(newEmail) || string.IsNullOrWhiteSpace(newEmail))
@@ -30,6 +29,11 @@ namespace SimpleCQRS.Domain
             {
                 this.ApplyChange(new AttendeeChangeEmailConfirmed(this.Id, confirmationId, this._newEmail));
             }
+        }
+
+        public void Unregister(string reason)
+        {
+            this.ApplyChange(new AttendeeUnregistered(this.Id, reason));
         }
 
         private void Apply(AttendeeRegistered @event) 

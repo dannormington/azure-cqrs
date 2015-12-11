@@ -5,18 +5,18 @@ using System.Threading.Tasks;
 namespace SimpleCQRS.Infrastructure
 {
     /// <summary>
-    /// Simple interface to handle registering event handlers
+    /// Simple interface to handle sending messages
     /// </summary>
-    public interface IEventBus : IDisposable
+    public interface IMessageBus : IDisposable
     {
         /// <summary>
         /// Register a handler for a specific event
         /// </summary>
-        /// <typeparam name="TMessageType"></typeparam>
+        /// <typeparam name="TMessage"></typeparam>
         /// <typeparam name="TImplementation"></typeparam>
-        void RegisterEventHandler<TEvent, TImplementation>()
-            where TEvent : IEvent
-            where TImplementation : class, IHandles<TEvent>;
+        void RegisterHandler<TMessage, TImplementation>()
+            where TMessage : IMessage
+            where TImplementation : class, IHandles<TMessage>;
 
         /// <summary>
         /// Publish the event to all handlers asynchronously
@@ -64,5 +64,13 @@ namespace SimpleCQRS.Infrastructure
         /// <returns></returns>
         Task PublishToQueueAsync<T>(IEnumerable<T> events)
             where T : class, IEvent;
+
+        /// <summary>
+        /// Send a command
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="command"></param>
+        void Send<T>(T command)
+            where T : class, ICommand;
     }
 }

@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace SimpleCQRS.Infrastructure
+namespace SimpleCQRS.Infrastructure.Persistence
 {
     /// <summary>
     /// Repository implementation
@@ -16,11 +16,12 @@ namespace SimpleCQRS.Infrastructure
         private readonly IEventStore _eventStore;
 
         /// <summary>
-        /// Constructor
+        /// Default Constructor
         /// </summary>
-        public Repository()
+        /// <param name="eventStore"></param>
+        public Repository(IEventStore eventStore)
         {
-            _eventStore = new EventStore();
+            _eventStore = eventStore;
         }
 
         /// <summary>

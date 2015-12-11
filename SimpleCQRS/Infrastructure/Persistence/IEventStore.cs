@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SimpleCQRS.Infrastructure
+namespace SimpleCQRS.Infrastructure.Persistence
 {
     /// <summary>
     /// Interface to an event store

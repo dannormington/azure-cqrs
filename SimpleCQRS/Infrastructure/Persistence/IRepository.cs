@@ -1,11 +1,6 @@
-﻿using SimpleCQRS.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace SimpleCQRS.Infrastructure
+namespace SimpleCQRS.Infrastructure.Persistence
 {
     /// <summary>
     /// Represents an interface to a repository

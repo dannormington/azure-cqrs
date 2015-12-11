@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCQRSWorkerRole", "Sim
 EndProject
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AzureSimpleCQRSCloudService", "AzureSimpleCQRSCloudService\AzureSimpleCQRSCloudService.ccproj", "{368B291F-E072-48AE-9667-E3BC46EB2215}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleCQRSWebRole", "SimpleCQRSWebRole\SimpleCQRSWebRole.csproj", "{F18F45D4-E6B2-4B3C-BB84-7F0DE551FD57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{368B291F-E072-48AE-9667-E3BC46EB2215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{368B291F-E072-48AE-9667-E3BC46EB2215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{368B291F-E072-48AE-9667-E3BC46EB2215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F18F45D4-E6B2-4B3C-BB84-7F0DE551FD57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F18F45D4-E6B2-4B3C-BB84-7F0DE551FD57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F18F45D4-E6B2-4B3C-BB84-7F0DE551FD57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F18F45D4-E6B2-4B3C-BB84-7F0DE551FD57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

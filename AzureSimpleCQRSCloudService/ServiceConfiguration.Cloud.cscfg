@@ -6,7 +6,16 @@
       <Setting name="Microsoft.ServiceBus.ConnectionString" value="" />
       <Setting name="Microsoft.ServiceBus.EventQueue" value="events" />
       <Setting name="Microsoft.WindowsAzure.Storage.ConnectionString" value="" />
-      <Setting name="Microsoft.WindowsAzure.Storage.EventStoreTable" value="" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="" />
+    </ConfigurationSettings>
+  </Role>
+  <Role name="SimpleCQRSWebRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="" />
+      <Setting name="Microsoft.ServiceBus.EventQueue" value="events" />
+      <Setting name="Microsoft.WindowsAzure.Storage.ConnectionString" value="" />
+      <Setting name="Microsoft.WindowsAzure.Storage.EventStoreTable" value="eventstore" />
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="" />
     </ConfigurationSettings>
   </Role>

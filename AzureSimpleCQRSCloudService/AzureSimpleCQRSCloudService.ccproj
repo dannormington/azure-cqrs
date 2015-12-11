@@ -37,12 +37,22 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="SimpleCQRSWebRoleContent\" />
     <Folder Include="SimpleCQRSWorkerRoleContent\" />
   </ItemGroup>
   <ItemGroup>
+    <DiagnosticsConfiguration Include="SimpleCQRSWebRoleContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="SimpleCQRSWorkerRoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SimpleCQRSWebRole\SimpleCQRSWebRole.csproj">
+      <Name>SimpleCQRSWebRole</Name>
+      <Project>{f18f45d4-e6b2-4b3c-bb84-7f0de551fd57}</Project>
+      <Private>True</Private>
+      <RoleType>Web</RoleType>
+      <RoleName>SimpleCQRSWebRole</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleCQRSWorkerRole\SimpleCQRSWorkerRole.csproj">
       <Name>SimpleCQRSWorkerRole</Name>
       <Project>{48eeecab-e245-40c4-994e-055f50c4d4cd}</Project>

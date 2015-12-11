@@ -8,8 +8,8 @@ namespace SimpleCQRS.Events
         public readonly string Email;
         public readonly Guid ConfirmationId;
 
-        public AttendeeChangeEmailConfirmed(Guid id, Guid confirmationId, string email)
-            : base(id) 
+        public AttendeeChangeEmailConfirmed(Guid attendeeId, Guid confirmationId, string email)
+            : base(attendeeId) 
         {
             this.Email = email;
             this.ConfirmationId = confirmationId;

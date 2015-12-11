@@ -10,6 +10,9 @@ using SimpleCQRS.Handlers;
 using SimpleCQRS.Events;
 using Newtonsoft.Json;
 using SimpleCQRS.Infrastructure;
+using Microsoft.Azure;
+using Microsoft.Practices.Unity;
+using SimpleCQRS.Infrastructure.Query;
 
 namespace SimpleCQRSWorkerRole
 {
@@ -17,22 +20,23 @@ namespace SimpleCQRSWorkerRole
     {
         QueueClient _queueClient;
         ManualResetEvent _completedEvent = new ManualResetEvent(false);
-        IEventBus _eventBus;
+        IUnityContainer _unityContainer = new UnityContainer();
         
         public override void Run()
         {
             Trace.WriteLine("Starting processing of messages");
 
-            // Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
+            //Initiates the message pump and callback is invoked for each message that is received, calling close on the client will stop the pump.
             _queueClient.OnMessage((receivedMessage) =>
                 {
                     try
                     {
                         ProcessMessage(receivedMessage);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // Handle any message processing specific exceptions here
+                       // Handle any message processing specific exceptions here
+                       Trace.WriteLine(ex.Message);
                     }
                 });
 
@@ -49,7 +53,7 @@ namespace SimpleCQRSWorkerRole
             // Create the queue if it does not exist already
             string connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
             string queue = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.EventQueue");
-                
+
             var namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
             if (!namespaceManager.QueueExists(queue))
             {
@@ -58,12 +62,13 @@ namespace SimpleCQRSWorkerRole
 
             // Initialize the connection to Service Bus Queue
             _queueClient = QueueClient.CreateFromConnectionString(connectionString, queue);
+
             return base.OnStart();
         }
 
         public override void OnStop()
         {
-            _eventBus.Dispose();
+            _unityContainer.Dispose();
             
             // Close the connection to Service Bus Queue
             _queueClient.Close();
@@ -86,17 +91,22 @@ namespace SimpleCQRSWorkerRole
 
             var message = JsonConvert.DeserializeObject(json, messageType);
 
-            _eventBus.PublishAsync(message);
+            var messageBus = _unityContainer.Resolve<IMessageBus>();
+            messageBus.PublishAsync(message);
 
             receivedMessage.Complete();
         }
 
         private void RegisterHandlers() 
         {
-            _eventBus = new EventBus();
-            _eventBus.RegisterEventHandler<AttendeeRegistered, ConferenceEventHandler>();
-            _eventBus.RegisterEventHandler<AttendeeEmailChanged, ConferenceEventHandler>();
-            _eventBus.RegisterEventHandler<AttendeeChangeEmailConfirmed, ConferenceEventHandler>();
+            IMessageBus messageBus = new MessageBus(_unityContainer);
+            messageBus.RegisterHandler<AttendeeRegistered, ConferenceEventHandler>();
+            messageBus.RegisterHandler<AttendeeEmailChanged, ConferenceEventHandler>();
+            messageBus.RegisterHandler<AttendeeChangeEmailConfirmed, ConferenceEventHandler>();
+            messageBus.RegisterHandler<AttendeeUnregistered, ConferenceEventHandler>();
+
+            _unityContainer.RegisterInstance(messageBus);
+            _unityContainer.RegisterType<IDataAccess<AttendeeEntity>, AttendeeDataAccess>();
         }
     }
 }
