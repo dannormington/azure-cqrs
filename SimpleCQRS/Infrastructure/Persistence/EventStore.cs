@@ -58,8 +58,7 @@ namespace SimpleCQRS.Infrastructure.Persistence
             if (results.Any()) 
             {
                 //no need to wait for publishing to the queue
-                //_messageBus.PublishToQueueAsync(events);
-                _messageBus.Publish(events);
+                _messageBus.PublishToQueueAsync(events);
             }
         }
 
