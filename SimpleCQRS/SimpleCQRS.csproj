@@ -120,6 +120,8 @@
     <Compile Include="Infrastructure\IHandles.cs" />
     <Compile Include="Infrastructure\IMessage.cs" />
     <Compile Include="Infrastructure\Query\AttendeeDataAccess.cs" />
+    <Compile Include="Infrastructure\Query\DataAccess.cs" />
+    <Compile Include="Infrastructure\Query\IAttendeeDataAccess.cs" />
     <Compile Include="Infrastructure\Query\IDataAccess.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Infrastructure\Query\AttendeeEntity.cs" />

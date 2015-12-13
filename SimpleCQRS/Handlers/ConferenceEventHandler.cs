@@ -4,16 +4,18 @@ using SimpleCQRS.Infrastructure.Query;
 
 namespace SimpleCQRS.Handlers
 {
+    /// <summary>
+    /// Class to handle conference attendee events
+    /// </summary>
     public class ConferenceEventHandler : 
         IHandles<AttendeeRegistered>,
         IHandles<AttendeeChangeEmailConfirmed>,
         IHandles<AttendeeEmailChanged>,
         IHandles<AttendeeUnregistered>
     {
+        private readonly IAttendeeDataAccess _dataAccess;
 
-        private readonly IDataAccess<AttendeeEntity> _dataAccess;
-
-        public ConferenceEventHandler(IDataAccess<AttendeeEntity> dataAccess)
+        public ConferenceEventHandler(IAttendeeDataAccess dataAccess)
         {
             _dataAccess = dataAccess;
         }

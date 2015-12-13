@@ -1,4 +1,5 @@
-﻿using Microsoft.Practices.Unity;
+﻿using Microsoft.Azure;
+using Microsoft.Practices.Unity;
 using SimpleCQRS.Commands;
 using SimpleCQRS.Domain;
 using SimpleCQRS.Events;
@@ -27,7 +28,7 @@ namespace SimpleCQRSWebRole
             container.RegisterInstance(messageBus);
             container.RegisterType<IEventStore, EventStore>();
             container.RegisterType<IRepository<Attendee>, Repository<Attendee>>();
-            container.RegisterType<IDataAccess<AttendeeEntity>, AttendeeDataAccess>();
+            container.RegisterType<IAttendeeDataAccess, AttendeeDataAccess>();
             
             config.DependencyResolver = new DependencyResolver(container);
 

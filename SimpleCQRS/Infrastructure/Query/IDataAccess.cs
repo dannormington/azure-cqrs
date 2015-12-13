@@ -15,7 +15,7 @@ namespace SimpleCQRS.Infrastructure.Query
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        T GetById(Guid id);
+        T Get(string partitionKey, string rowKey);
 
         /// <summary>
         /// Insert a new entity

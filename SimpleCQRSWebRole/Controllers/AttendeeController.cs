@@ -3,7 +3,6 @@ using SimpleCQRS.Infrastructure;
 using SimpleCQRS.Infrastructure.Query;
 using SimpleCQRSWebRole.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
@@ -14,28 +13,23 @@ namespace SimpleCQRSWebRole.Controllers
 {
     public class AttendeeController : ApiController
     {
-        private IMessageBus _bus;
+        private readonly IMessageBus _bus;
+        private readonly IAttendeeDataAccess _dataAccess;
 
-        public AttendeeController(IMessageBus bus) {
+        public AttendeeController(IMessageBus bus, IAttendeeDataAccess dataAccess) {
             _bus = bus;
+            _dataAccess = dataAccess;
         }
 
-        // GET: api/Attendee
-        public IEnumerable<Attendee> Get()
-        {
-            //don't support getting back the entire list
-            return new Attendee[] { };
-        }
-
-        // GET: api/Attendee/5
+        [HttpGet]
         [ResponseType(typeof(Attendee))]
-        public HttpResponseMessage Get(Guid? id)
+        [Route("api/attendee/{attendeeId}")]
+        public HttpResponseMessage GetAttendee(Guid? attendeeId)
         {
-            if (id.HasValue)
+            if (attendeeId.HasValue)
             {
-                IDataAccess<AttendeeEntity> data = new AttendeeDataAccess();
-                var attendee = data.GetById(id.Value);
-
+                var attendee = _dataAccess.GetById(attendeeId.Value);
+              
                 if (attendee != null)
                 {
                     return Request.CreateResponse(HttpStatusCode.OK, new Attendee()
@@ -49,8 +43,8 @@ namespace SimpleCQRSWebRole.Controllers
             return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        // POST: api/Attendee
-        public HttpResponseMessage Post([FromBody]RegisterAttendee value)
+        [HttpPost]
+        public HttpResponseMessage RegisterAttendee([FromBody]RegisterAttendee value)
         {
             try
             {
@@ -66,12 +60,20 @@ namespace SimpleCQRSWebRole.Controllers
             }
         }
 
-        // PUT: api/Attendee
-        public HttpResponseMessage Put([FromBody]ChangeEmailAddress value)
+        [HttpPost]
+        [Route("api/attendee/{attendeeId}/email")]
+        public HttpResponseMessage ChangeEmail(Guid? attendeeId, [FromBody]ChangeEmailAddress command)
         {
+            if (!attendeeId.HasValue || command == null || string.IsNullOrEmpty(command.Email))
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+
             try
             {
-                _bus.Send(value);
+                command.AttendeeId = attendeeId.Value;
+                
+                _bus.Send(command);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             catch (Exception ex)
@@ -83,9 +85,9 @@ namespace SimpleCQRSWebRole.Controllers
             }
         }
 
-        // PUT: Confirm change email address
-        [Route("api/Attendee/{attendeeId}/email/{confirmationId}")]
-        public HttpResponseMessage Put(Guid? attendeeId, Guid? confirmationId)
+        [HttpPost]
+        [Route("api/attendee/{attendeeId}/email/{confirmationId}")]
+        public HttpResponseMessage ConfirmChangeEmail(Guid? attendeeId, Guid? confirmationId)
         {
 
             if (!attendeeId.HasValue || !confirmationId.HasValue)
@@ -93,7 +95,6 @@ namespace SimpleCQRSWebRole.Controllers
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
 
-            //build the command
             var command = new ConfirmChangeEmailAddress()
             {
                 AttendeeId = attendeeId.Value,
@@ -114,8 +115,9 @@ namespace SimpleCQRSWebRole.Controllers
             }
         }
 
-        // DELETE: api/Attendee/5
-        public HttpResponseMessage Delete([FromBody]UnregisterAttendee value)
+        [HttpDelete]
+        [Route("api/attendee/{attendeeId}")]
+        public HttpResponseMessage UnregisterAttendee(Guid? attendeeId, [FromBody]UnregisterAttendee value)
         {
             try
             {

@@ -35,8 +35,8 @@ namespace SimpleCQRSWorkerRole
                     }
                     catch (Exception ex)
                     {
-                       // Handle any message processing specific exceptions here
-                       Trace.WriteLine(ex.Message);
+                        // Handle any message processing specific exceptions here
+                        Trace.WriteLine(ex.Message);
                     }
                 });
 
@@ -106,7 +106,7 @@ namespace SimpleCQRSWorkerRole
             messageBus.RegisterHandler<AttendeeUnregistered, ConferenceEventHandler>();
 
             _unityContainer.RegisterInstance(messageBus);
-            _unityContainer.RegisterType<IDataAccess<AttendeeEntity>, AttendeeDataAccess>();
+            _unityContainer.RegisterType<IAttendeeDataAccess, AttendeeDataAccess>();
         }
     }
 }

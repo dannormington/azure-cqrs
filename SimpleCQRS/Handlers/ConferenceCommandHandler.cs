@@ -6,6 +6,9 @@ using SimpleCQRS.Infrastructure.Persistence;
 
 namespace SimpleCQRS.Handlers
 {
+    /// <summary>
+    /// Class to handle conference attendee commands
+    /// </summary>
     public class ConferenceCommandHandler : 
         IHandles<RegisterAttendee>, 
         IHandles<ChangeEmailAddress>, 
