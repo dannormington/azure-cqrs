@@ -6,6 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 
@@ -44,11 +45,11 @@ namespace SimpleCQRSWebRole.Controllers
         }
 
         [HttpPost]
-        public HttpResponseMessage RegisterAttendee([FromBody]RegisterAttendee value)
+        public async Task<HttpResponseMessage> RegisterAttendeeAsync([FromBody]RegisterAttendee value)
         {
             try
             {
-                _bus.Send(value);
+                await _bus.SendAsync(value);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             catch (Exception ex)
@@ -62,7 +63,7 @@ namespace SimpleCQRSWebRole.Controllers
 
         [HttpPost]
         [Route("api/attendee/{attendeeId}/email")]
-        public HttpResponseMessage ChangeEmail(Guid? attendeeId, [FromBody]ChangeEmailAddress command)
+        public async Task<HttpResponseMessage> ChangeEmailAsync(Guid? attendeeId, [FromBody]ChangeEmailAddress command)
         {
             if (!attendeeId.HasValue || command == null || string.IsNullOrEmpty(command.Email))
             {
@@ -73,7 +74,7 @@ namespace SimpleCQRSWebRole.Controllers
             {
                 command.AttendeeId = attendeeId.Value;
                 
-                _bus.Send(command);
+                await _bus.SendAsync(command);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             catch (Exception ex)
@@ -87,9 +88,8 @@ namespace SimpleCQRSWebRole.Controllers
 
         [HttpPost]
         [Route("api/attendee/{attendeeId}/email/{confirmationId}")]
-        public HttpResponseMessage ConfirmChangeEmail(Guid? attendeeId, Guid? confirmationId)
+        public async Task<HttpResponseMessage> ConfirmChangeEmailAsync(Guid? attendeeId, Guid? confirmationId)
         {
-
             if (!attendeeId.HasValue || !confirmationId.HasValue)
             {
                 return new HttpResponseMessage(HttpStatusCode.BadRequest);
@@ -103,7 +103,7 @@ namespace SimpleCQRSWebRole.Controllers
 
             try
             {
-                _bus.Send(command);
+                await _bus.SendAsync(command);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             catch (Exception ex)
@@ -117,11 +117,11 @@ namespace SimpleCQRSWebRole.Controllers
 
         [HttpDelete]
         [Route("api/attendee/{attendeeId}")]
-        public HttpResponseMessage UnregisterAttendee(Guid? attendeeId, [FromBody]UnregisterAttendee value)
+        public async Task<HttpResponseMessage> UnregisterAttendeeAsync(Guid? attendeeId, [FromBody]UnregisterAttendee value)
         {
             try
             {
-                _bus.Send(value);
+                await _bus.SendAsync(value);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
             catch (Exception ex)

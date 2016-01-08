@@ -52,35 +52,14 @@ namespace SimpleCQRS.Infrastructure
             return PublishAsync(@event);
         }
 
-        void IMessageBus.Publish<T>(T @event)
-        {
-            Publish(@event);
-        }
-
-        void IMessageBus.Publish(object @event)
-        {
-            Publish(@event);
-        }
-
-        void IMessageBus.Publish<T>(IEnumerable<T> events)
-        {
-            if (@events != null && @events.Any()) 
-            {
-                foreach (var @event in events) 
-                {
-                    Publish(@event);
-                }
-            }
-        }
-
         Task IMessageBus.PublishToQueueAsync<T>(IEnumerable<T> events)
         {
             return PublishToQueueAsync(events);
         }
 
-        void IMessageBus.Send<T>(T command)
+        Task IMessageBus.SendAsync<T>(T command)
         {
-            Send(command);
+            return SendAsync(command);
         }
 
         /// <summary>
@@ -108,11 +87,11 @@ namespace SimpleCQRS.Infrastructure
 
                 foreach (var handler in handlers)
                 {
-                    tasks.Add(Task.Run(() =>
+                    tasks.Add(Task.Run(async() =>
                     {
                         try
                         {
-                            myType.InvokeMember("Handle", BindingFlags.InvokeMethod, null, handler, new[] { @event });
+                            await (Task)myType.InvokeMember("HandleAsync", BindingFlags.InvokeMethod, null, handler, new[] { @event });
                         }
                         catch
                         {
@@ -123,42 +102,6 @@ namespace SimpleCQRS.Infrastructure
                 }
 
                 await Task.WhenAll(tasks);
-            }
-        }
-
-        /// <summary>
-        /// Publish the message to all handlers asynchronously
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        private void Publish(object @event)
-        {
-            if (@event == null)
-                return;
-
-            //Get a instance of the generic handler's type
-            Type genericType = typeof(IHandles<>);
-
-            //Get and instance of the domain events type
-            Type myType = genericType.MakeGenericType(@event.GetType());
-
-            //Get a list of all the handlers for this message type
-            var handlers = _unityContainer.ResolveAll(myType);
-
-            if (handlers != null && handlers.Any())
-            {
-                foreach (var handler in handlers)
-                {
-                    try
-                    {
-                        myType.InvokeMember("Handle", BindingFlags.InvokeMethod, null, handler, new[] { @event });
-                    }
-                    catch
-                    {
-                        //push the message to an error queue identifying which handler failed
-                        Trace.WriteLine(string.Format("Exception handling {0}", @event.GetType().FullName));
-                    } 
-                }
             }
         }
 
@@ -189,7 +132,7 @@ namespace SimpleCQRS.Infrastructure
             messageSender.Close();
         }
 
-        private void Send<T>(T command)
+        private async Task SendAsync<T>(T command)
             where T : class, ICommand
         {
             if (command == null)
@@ -215,13 +158,17 @@ namespace SimpleCQRS.Infrastructure
                 try
                 {
                     var handler = handlers.First();
-                    myType.InvokeMember("Handle", BindingFlags.InvokeMethod, null, handler, new[] { command });
+                    await (Task)myType.InvokeMember("HandleAsync", BindingFlags.InvokeMethod, null, handler, new[] { command });
                 }
                 catch
                 {
                     //push the message to an error queue identifying which handler failed
                     Trace.WriteLine(string.Format("Exception handling {0}", command.GetType().FullName));
                 }
+            }
+            else
+            {
+                Trace.WriteLine(string.Format("No handler for the following command: {0}", command.GetType().FullName));
             }
         }
     }

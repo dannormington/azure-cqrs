@@ -3,6 +3,7 @@ using SimpleCQRS.Commands;
 using System;
 using SimpleCQRS.Domain;
 using SimpleCQRS.Infrastructure.Persistence;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Handlers
 {
@@ -22,31 +23,31 @@ namespace SimpleCQRS.Handlers
             _repository = repository;
         }
 
-        void IHandles<ConfirmChangeEmailAddress>.Handle(ConfirmChangeEmailAddress command)
+        Task IHandles<ConfirmChangeEmailAddress>.HandleAsync(ConfirmChangeEmailAddress command)
         {
             var attendee = _repository.GetById(command.AttendeeId);
             attendee.ConfirmChangeEmail(command.ConfirmationId);
-            _repository.Save(attendee);
+            return _repository.SaveAsync(attendee);
         }
 
-        void IHandles<UnregisterAttendee>.Handle(UnregisterAttendee command)
+        Task IHandles<UnregisterAttendee>.HandleAsync(UnregisterAttendee command)
         {
             var attendee = _repository.GetById(command.AttendeeId);
             attendee.Unregister(command.Reason);
-            _repository.Save(attendee);
+            return _repository.SaveAsync(attendee);
         }
 
-        void IHandles<ChangeEmailAddress>.Handle(ChangeEmailAddress command)
+        Task IHandles<ChangeEmailAddress>.HandleAsync(ChangeEmailAddress command)
         {
             var attendee = _repository.GetById(command.AttendeeId);
             attendee.ChangeEmailAddress(command.Email);
-            _repository.Save(attendee);
+            return _repository.SaveAsync(attendee);
         }
 
-        void IHandles<RegisterAttendee>.Handle(RegisterAttendee command)
+        Task IHandles<RegisterAttendee>.HandleAsync(RegisterAttendee command)
         {
             var attendee = new Attendee(command.AttendeeId, command.Email);
-            _repository.Save(attendee);
+            return _repository.SaveAsync(attendee);
         }
     }
 }

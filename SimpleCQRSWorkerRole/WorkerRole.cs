@@ -92,7 +92,7 @@ namespace SimpleCQRSWorkerRole
             var message = JsonConvert.DeserializeObject(json, messageType);
 
             var messageBus = _unityContainer.Resolve<IMessageBus>();
-            messageBus.PublishAsync(message);
+            messageBus.PublishAsync(message).Wait();
 
             receivedMessage.Complete();
         }

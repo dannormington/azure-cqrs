@@ -1,6 +1,7 @@
 ﻿using SimpleCQRS.Domain;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Persistence
 {
@@ -29,9 +30,9 @@ namespace SimpleCQRS.Infrastructure.Persistence
         /// </summary>
         /// <param name="aggregate"></param>
         /// <param name="handleEventsSynchronously"></param>
-        public void Save(IAggregateRoot aggregate)
+        public async Task SaveAsync(IAggregateRoot aggregate)
         {
-            _eventStore.SaveEvents(aggregate.Id, aggregate.CurrentVersion, aggregate.GetUncommittedChanges());
+            await _eventStore.SaveEventsAsync(aggregate.Id, aggregate.CurrentVersion, aggregate.GetUncommittedChanges());
             aggregate.MarkChangesAsCommitted();
         }
 

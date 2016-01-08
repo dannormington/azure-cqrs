@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Persistence
 {
@@ -12,7 +13,7 @@ namespace SimpleCQRS.Infrastructure.Persistence
         /// Save the aggregate
         /// </summary>
         /// <param name="aggregate"></param>
-        void Save(IAggregateRoot aggregate);
+        Task SaveAsync(IAggregateRoot aggregate);
 
         /// <summary>
         /// Get the aggregate

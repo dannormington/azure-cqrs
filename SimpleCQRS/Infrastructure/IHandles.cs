@@ -1,4 +1,6 @@
-﻿namespace SimpleCQRS.Infrastructure
+﻿using System.Threading.Tasks;
+
+namespace SimpleCQRS.Infrastructure
 {
     /// <summary>
     /// Interface for handling messages
@@ -11,6 +13,6 @@
         /// Handle the message
         /// </summary>
         /// <param name="message"></param>
-        void Handle(T message);
+        Task HandleAsync(T message);
     }
 }

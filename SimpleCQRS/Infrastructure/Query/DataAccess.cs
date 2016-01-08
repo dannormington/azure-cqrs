@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.Azure;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Query
 {
@@ -45,20 +46,20 @@ namespace SimpleCQRS.Infrastructure.Query
             return query.FirstOrDefault();
         }
 
-        public TableResult Insert(T entity)
+        public Task<TableResult> InsertAsync(T entity)
         {
             Initialize();
 
             var operation = TableOperation.Insert(entity);
-            return _table.Execute(operation);
+            return _table.ExecuteAsync(operation);
         }
 
-        public TableResult Update(T entity)
+        public Task<TableResult> UpdateAsync(T entity)
         {
             Initialize();
 
             var operation = TableOperation.Merge(entity);
-            return _table.Execute(operation);
+            return _table.ExecuteAsync(operation);
         }
     }
 }

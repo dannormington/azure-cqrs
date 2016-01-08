@@ -106,6 +106,7 @@
     <Compile Include="Events\AttendeeUnregistered.cs" />
     <Compile Include="Handlers\ConferenceCommandHandler.cs" />
     <Compile Include="Infrastructure\Event.cs" />
+    <Compile Include="Infrastructure\EventCollisionException.cs" />
     <Compile Include="Infrastructure\Persistence\EventEntity.cs" />
     <Compile Include="Infrastructure\Persistence\EventStore.cs" />
     <Compile Include="Infrastructure\ICommand.cs" />

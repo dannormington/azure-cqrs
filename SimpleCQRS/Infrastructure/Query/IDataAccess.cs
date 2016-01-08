@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Query
 {
@@ -22,13 +23,13 @@ namespace SimpleCQRS.Infrastructure.Query
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        TableResult Insert(T entity);
+        Task<TableResult> InsertAsync(T entity);
 
         /// <summary>
         /// Update an entity
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        TableResult Update(T entity);
+        Task<TableResult> UpdateAsync(T entity);
     }
 }

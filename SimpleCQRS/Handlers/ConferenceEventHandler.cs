@@ -1,6 +1,7 @@
 ﻿using SimpleCQRS.Events;
 using SimpleCQRS.Infrastructure;
 using SimpleCQRS.Infrastructure.Query;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Handlers
 {
@@ -20,18 +21,18 @@ namespace SimpleCQRS.Handlers
             _dataAccess = dataAccess;
         }
 
-        void IHandles<AttendeeRegistered>.Handle(AttendeeRegistered message)
+        async Task IHandles<AttendeeRegistered>.HandleAsync(AttendeeRegistered message)
         {
             var attendee = _dataAccess.GetById(message.Id);
 
             if (attendee == null)
             {
                 attendee = new AttendeeEntity(message.Id, message.Email);
-                _dataAccess.Insert(attendee);
+                await _dataAccess.InsertAsync(attendee);
             }
         }
 
-        void IHandles<AttendeeUnregistered>.Handle(AttendeeUnregistered message)
+        async Task IHandles<AttendeeUnregistered>.HandleAsync(AttendeeUnregistered message)
         {
             var attendee = _dataAccess.GetById(message.Id);
 
@@ -39,24 +40,25 @@ namespace SimpleCQRS.Handlers
             {
                 attendee.IsActiveRegistration = false;
                 attendee.ReasonForUnregistration = message.Reason;
-                _dataAccess.Update(attendee);
+                await _dataAccess.UpdateAsync(attendee);
             }
         }
 
-        void IHandles<AttendeeChangeEmailConfirmed>.Handle(AttendeeChangeEmailConfirmed message)
+        async Task IHandles<AttendeeChangeEmailConfirmed>.HandleAsync(AttendeeChangeEmailConfirmed message)
         {
             var attendee = _dataAccess.GetById(message.Id);
 
             if (attendee != null)
             {
                 attendee.Email = message.Email;
-                _dataAccess.Update(attendee);
+                await _dataAccess.UpdateAsync(attendee);
             }
         }
 
-        void IHandles<AttendeeEmailChanged>.Handle(AttendeeEmailChanged message)
+        Task IHandles<AttendeeEmailChanged>.HandleAsync(AttendeeEmailChanged message)
         {
             //nothing to do yet
+            return Task.FromResult(0);
         }
     }
 }

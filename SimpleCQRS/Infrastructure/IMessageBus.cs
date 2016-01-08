@@ -35,28 +35,6 @@ namespace SimpleCQRS.Infrastructure
         Task PublishAsync(object @event);
 
         /// <summary>
-        /// Publish the event to all handlers synchronously
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="event"></param>
-        void Publish<T>(T @event)
-            where T : class, IEvent;
-
-        /// <summary>
-        /// Publish the event to all handlers synchronously
-        /// </summary>
-        /// <param name="event"></param>
-        void Publish(object @event);
-
-        /// <summary>
-        /// Publish the events to all handlers synchronously
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="events"></param>
-        void Publish<T>(IEnumerable<T> events)
-            where T : class, IEvent;
-
-        /// <summary>
         /// Publish the events to the default queue asynchronously
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -70,7 +48,7 @@ namespace SimpleCQRS.Infrastructure
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="command"></param>
-        void Send<T>(T command)
+        Task SendAsync<T>(T command)
             where T : class, ICommand;
     }
 }

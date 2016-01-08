@@ -5,7 +5,10 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Services.Client;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Persistence
 {
@@ -35,10 +38,10 @@ namespace SimpleCQRS.Infrastructure.Persistence
         /// <param name="aggregateId"></param>
         /// <param name="currentVersion"></param>
         /// <param name="events"></param>
-        public void SaveEvents(Guid aggregateId, int currentVersion, IEnumerable<IEvent> events)
+        public Task SaveEventsAsync(Guid aggregateId, int currentVersion, IEnumerable<IEvent> events)
         {
             if (events == null || !events.Any())
-                return;
+                return Task.FromResult(0);
 
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
@@ -53,13 +56,22 @@ namespace SimpleCQRS.Infrastructure.Persistence
                 batchOperation.Insert(new EventEntity(@event, currentVersion));
             }
 
-            var results = table.ExecuteBatch(batchOperation);
-
-            if (results.Any()) 
+            try
             {
-                //no need to wait for publishing to the queue
-                _messageBus.PublishToQueueAsync(events);
+                table.ExecuteBatch(batchOperation);
             }
+            catch (StorageException ex)
+            {
+                if (ex.RequestInformation != null && (HttpStatusCode)ex.RequestInformation.HttpStatusCode == HttpStatusCode.Conflict)
+                {
+                    throw new EventCollisionException();
+                }
+
+                throw;
+            }
+            
+            //publish the events
+            return _messageBus.PublishToQueueAsync(events);
         }
 
         /// <summary>

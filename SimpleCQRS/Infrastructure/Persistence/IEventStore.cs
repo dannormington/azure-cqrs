@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure.Persistence
 {
@@ -14,7 +15,7 @@ namespace SimpleCQRS.Infrastructure.Persistence
         /// <param name="aggregateId"></param>
         /// <param name="currentVersion"></param>
         /// <param name="events"></param>
-        void SaveEvents(Guid aggregateId, int currentVersion, IEnumerable<IEvent> events);
+        Task SaveEventsAsync(Guid aggregateId, int currentVersion, IEnumerable<IEvent> events);
 
         /// <summary>
         /// Get the events for an aggregate
