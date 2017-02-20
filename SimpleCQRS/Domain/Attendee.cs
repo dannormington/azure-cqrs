@@ -5,7 +5,7 @@ namespace SimpleCQRS.Domain
 {
     public class Attendee : AggregateRoot
     {
-        private string _newEmail;
+        private string _unconfirmedEmail;
         private Guid? _confirmationId;
 
         public Attendee() { }
@@ -15,19 +15,19 @@ namespace SimpleCQRS.Domain
             this.ApplyChange(new AttendeeRegistered(id, email));
         }
 
-        public void ChangeEmailAddress(string newEmail) 
+        public void ChangeEmailAddress(string email) 
         {
-            if (string.IsNullOrEmpty(newEmail) || string.IsNullOrWhiteSpace(newEmail))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrWhiteSpace(email))
                 return;
 
-            this.ApplyChange(new AttendeeEmailChanged(this.Id, Guid.NewGuid(), newEmail.Trim()));
+            this.ApplyChange(new AttendeeEmailChanged(this.Id, Guid.NewGuid(), email.Trim()));
         }
 
         public void ConfirmChangeEmail(Guid confirmationId) 
         {
             if (confirmationId == this._confirmationId) 
             {
-                this.ApplyChange(new AttendeeChangeEmailConfirmed(this.Id, confirmationId, this._newEmail));
+                this.ApplyChange(new AttendeeChangeEmailConfirmed(this.Id, confirmationId, this._unconfirmedEmail));
             }
         }
 
@@ -43,14 +43,14 @@ namespace SimpleCQRS.Domain
 
         private void Apply(AttendeeEmailChanged @event) 
         {
-            _newEmail = @event.Email;
+            _unconfirmedEmail = @event.Email;
             _confirmationId = @event.ConfirmationId;
         }
 
         private void Apply(AttendeeChangeEmailConfirmed @event) 
         {
-            _newEmail = null;
             _confirmationId = null;
+            _unconfirmedEmail = null;
         }
     }
 }
