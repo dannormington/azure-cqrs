@@ -45,91 +45,59 @@ namespace SimpleCQRSWebRole.Controllers
         }
 
         [HttpPost]
-        public async Task<HttpResponseMessage> RegisterAttendeeAsync([FromBody]RegisterAttendee value)
+        [Route("api/attendee/register")]
+        public async Task<HttpResponseMessage> RegisterAttendeeAsync([FromBody]RegisterAttendee command)
         {
-            try
-            {
-                await _bus.SendAsync(value);
-                return new HttpResponseMessage(HttpStatusCode.Accepted);
-            }
-            catch (Exception ex)
-            {
-                //log the exception
-                Trace.WriteLine(ex.Message);
-
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-            }
+            return await ProcessRequestAsync(command);
         }
 
         [HttpPost]
         [Route("api/attendee/{attendeeId}/email")]
         public async Task<HttpResponseMessage> ChangeEmailAsync(Guid? attendeeId, [FromBody]ChangeEmailAddress command)
         {
-            if (!attendeeId.HasValue || command == null || string.IsNullOrEmpty(command.Email))
-            {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
-            }
-
-            try
-            {
-                command.AttendeeId = attendeeId.Value;
-                
-                await _bus.SendAsync(command);
-                return new HttpResponseMessage(HttpStatusCode.Accepted);
-            }
-            catch (Exception ex)
-            {
-                //log the exception
-                Trace.WriteLine(ex.Message);
-
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-            }
+            command.AttendeeId = attendeeId.Value;
+            return await ProcessRequestAsync(command);
         }
 
         [HttpPost]
         [Route("api/attendee/{attendeeId}/email/{confirmationId}")]
         public async Task<HttpResponseMessage> ConfirmChangeEmailAsync(Guid? attendeeId, Guid? confirmationId)
         {
-            if (!attendeeId.HasValue || !confirmationId.HasValue)
-            {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
-            }
-
             var command = new ConfirmChangeEmailAddress()
             {
                 AttendeeId = attendeeId.Value,
                 ConfirmationId = confirmationId.Value
             };
 
+            return await ProcessRequestAsync(command);
+        }
+
+        [HttpDelete]
+        [Route("api/attendee/{attendeeId}")]
+        public async Task<HttpResponseMessage> UnregisterAttendeeAsync(Guid? attendeeId, [FromBody]UnregisterAttendee command)
+        {
+            command.AttendeeId = attendeeId.Value;
+            return await ProcessRequestAsync(command);
+        }
+
+        private async Task<HttpResponseMessage> ProcessRequestAsync(ICommand command)
+        {
             try
             {
                 await _bus.SendAsync(command);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
-            catch (Exception ex)
+            catch (InvalidOperationException x) 
             {
-                //log the exception
-                Trace.WriteLine(ex.Message);
-
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(x.Message) };
             }
-        }
-
-        [HttpDelete]
-        [Route("api/attendee/{attendeeId}")]
-        public async Task<HttpResponseMessage> UnregisterAttendeeAsync(Guid? attendeeId, [FromBody]UnregisterAttendee value)
-        {
-            try
+            catch (ArgumentException x)
             {
-                await _bus.SendAsync(value);
-                return new HttpResponseMessage(HttpStatusCode.Accepted);
+                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(x.Message) };
             }
-            catch (Exception ex)
+            catch (Exception x)
             {
-                //log the exception
-                Trace.WriteLine(ex.Message);
-
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(x.Message) };
             }
         }
     }

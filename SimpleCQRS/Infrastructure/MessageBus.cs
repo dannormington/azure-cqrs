@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 
 namespace SimpleCQRS.Infrastructure
@@ -155,15 +156,20 @@ namespace SimpleCQRS.Infrastructure
                     return;
                 }
 
+                var handler = handlers.First();
+
                 try
                 {
-                    var handler = handlers.First();
                     await (Task)myType.InvokeMember("HandleAsync", BindingFlags.InvokeMethod, null, handler, new[] { command });
                 }
-                catch
+                catch (TargetInvocationException x)
                 {
-                    //push the message to an error queue identifying which handler failed
-                    Trace.WriteLine(string.Format("Exception handling {0}", command.GetType().FullName));
+                    if (x.InnerException != null)
+                    {
+                        ExceptionDispatchInfo.Capture(x.InnerException).Throw();
+                    }
+
+                    throw;
                 }
             }
             else
