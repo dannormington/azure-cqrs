@@ -4,6 +4,7 @@ using System;
 using SimpleCQRS.Domain;
 using SimpleCQRS.Infrastructure.Persistence;
 using System.Threading.Tasks;
+using SimpleCQRS.Infrastructure.Exceptions;
 
 namespace SimpleCQRS.Handlers
 {
@@ -46,7 +47,21 @@ namespace SimpleCQRS.Handlers
 
         Task IHandles<RegisterAttendee>.HandleAsync(RegisterAttendee command)
         {
-            var attendee = new Attendee(command.AttendeeId, command.Email);
+            Attendee attendee = null;
+
+            try
+            {
+                attendee = _repository.GetById(command.AttendeeId);
+
+                //if the attended is found then throw an exception
+                throw new EventCollisionException(command.AttendeeId, "Attendee Id already exists");
+            }
+            catch (AggregateNotFoundException)
+            {
+                //do nothing
+            }
+
+            attendee = new Attendee(command.AttendeeId, command.Email);
             return _repository.SaveAsync(attendee);
         }
     }

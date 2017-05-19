@@ -1,11 +1,13 @@
-﻿using SimpleCQRS.Commands;
+﻿using Newtonsoft.Json;
+using SimpleCQRS.Commands;
 using SimpleCQRS.Infrastructure;
+using SimpleCQRS.Infrastructure.Exceptions;
 using SimpleCQRS.Infrastructure.Query;
 using SimpleCQRSWebRole.Models;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
@@ -55,6 +57,8 @@ namespace SimpleCQRSWebRole.Controllers
         [Route("api/attendee/{attendeeId}/email")]
         public async Task<HttpResponseMessage> ChangeEmailAsync(Guid? attendeeId, [FromBody]ChangeEmailAddress command)
         {
+            if (command == null) return new HttpResponseMessage(HttpStatusCode.BadRequest);
+
             command.AttendeeId = attendeeId.Value;
             return await ProcessRequestAsync(command);
         }
@@ -76,6 +80,8 @@ namespace SimpleCQRSWebRole.Controllers
         [Route("api/attendee/{attendeeId}")]
         public async Task<HttpResponseMessage> UnregisterAttendeeAsync(Guid? attendeeId, [FromBody]UnregisterAttendee command)
         {
+            if (command == null) return new HttpResponseMessage(HttpStatusCode.BadRequest);
+
             command.AttendeeId = attendeeId.Value;
             return await ProcessRequestAsync(command);
         }
@@ -84,21 +90,43 @@ namespace SimpleCQRSWebRole.Controllers
         {
             try
             {
+                if (command == null) return new HttpResponseMessage(HttpStatusCode.BadRequest);
+
                 await _bus.SendAsync(command);
                 return new HttpResponseMessage(HttpStatusCode.Accepted);
             }
-            catch (InvalidOperationException x) 
+            catch (EventCollisionException x)
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(x.Message) };
+                return BuildExceptionResponse(HttpStatusCode.Conflict, x);
+            }
+            catch (AggregateNotFoundException x)
+            {
+                return BuildExceptionResponse(HttpStatusCode.NotFound, x);
+            }
+            catch (HydrationException x)
+            {
+                return BuildExceptionResponse(HttpStatusCode.InternalServerError, x);
+            }
+            catch (InvalidOperationException x)
+            {
+                return BuildExceptionResponse(HttpStatusCode.BadRequest, x);
             }
             catch (ArgumentException x)
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest) { Content = new StringContent(x.Message) };
+                return BuildExceptionResponse(HttpStatusCode.BadRequest, x);
             }
             catch (Exception x)
             {
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent(x.Message) };
+                return BuildExceptionResponse(HttpStatusCode.InternalServerError, x);
             }
+        }
+
+        private HttpResponseMessage BuildExceptionResponse(HttpStatusCode status, Exception exception)
+        {
+            var error = new ExceptionResponse(status, exception.Message);
+            var json = JsonConvert.SerializeObject(error);
+
+            return new HttpResponseMessage(status) { Content = new StringContent(json, Encoding.UTF8, "application/json") };
         }
     }
 }

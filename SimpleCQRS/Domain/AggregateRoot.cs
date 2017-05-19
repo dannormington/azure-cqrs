@@ -16,31 +16,14 @@ namespace SimpleCQRS.Domain
         private readonly List<IEvent> _changes = new List<IEvent>();
 
         /// <summary>
-        /// Id of the aggregate
-        /// </summary>
-        protected Guid Id { get; set; }
-
-        /// <summary>
         /// Current version of the aggregate
         /// </summary>
         private int _currentVersion;
 
         /// <summary>
-        /// Constructor
+        /// Id of the aggregate
         /// </summary>
-        /// <param name="id"></param>
-        protected AggregateRoot(Guid id)
-        {
-            Id = id;
-        }
-
-        /// <summary>
-        /// Aggregate Root
-        /// </summary>
-        protected AggregateRoot()
-            : this(Guid.NewGuid())
-        {
-        }
+        protected Guid _id;
 
         /// <summary>
         /// Apply the change
@@ -95,7 +78,7 @@ namespace SimpleCQRS.Domain
 
         Guid IAggregateRoot.Id
         {
-            get { return Id; }
+            get { return _id; }
         }
 
         int IAggregateRoot.CurrentVersion 

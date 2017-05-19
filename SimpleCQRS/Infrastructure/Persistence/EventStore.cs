@@ -3,6 +3,7 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
+using SimpleCQRS.Infrastructure.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data.Services.Client;
@@ -64,7 +65,7 @@ namespace SimpleCQRS.Infrastructure.Persistence
             {
                 if (ex.RequestInformation != null && (HttpStatusCode)ex.RequestInformation.HttpStatusCode == HttpStatusCode.Conflict)
                 {
-                    throw new EventCollisionException();
+                    throw new EventCollisionException(aggregateId);
                 }
 
                 throw;
@@ -92,15 +93,26 @@ namespace SimpleCQRS.Infrastructure.Persistence
 
             var events = new List<IEvent>();
 
-            if (query.Any()) 
+            if (query.Any())
             {
-                foreach (var eventEntity in query.OrderBy(x => x.Version))
+                try
                 {
-                    Type type = Type.GetType(eventEntity.Type);
-                    var @event = JsonConvert.DeserializeObject(eventEntity.Event, type);
+                    foreach (var eventEntity in query.OrderBy(x => x.Version))
+                    {
+                        Type type = Type.GetType(eventEntity.Type);
+                        var @event = JsonConvert.DeserializeObject(eventEntity.Event, type);
 
-                    events.Add((IEvent)@event);
+                        events.Add((IEvent)@event);
+                    }
                 }
+                catch (JsonException)
+                {
+                    throw new HydrationException(aggregateId);
+                }
+            }
+            else
+            {
+                throw new AggregateNotFoundException(aggregateId);
             }
 
             return events;
