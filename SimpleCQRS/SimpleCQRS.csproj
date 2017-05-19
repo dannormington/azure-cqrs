@@ -106,7 +106,10 @@
     <Compile Include="Events\AttendeeUnregistered.cs" />
     <Compile Include="Handlers\ConferenceCommandHandler.cs" />
     <Compile Include="Infrastructure\Event.cs" />
-    <Compile Include="Infrastructure\EventCollisionException.cs" />
+    <Compile Include="Infrastructure\Exceptions\AggregateException.cs" />
+    <Compile Include="Infrastructure\Exceptions\AggregateNotFoundException.cs" />
+    <Compile Include="Infrastructure\Exceptions\EventCollisionException.cs" />
+    <Compile Include="Infrastructure\Exceptions\HydrationException.cs" />
     <Compile Include="Infrastructure\Persistence\EventEntity.cs" />
     <Compile Include="Infrastructure\Persistence\EventStore.cs" />
     <Compile Include="Infrastructure\ICommand.cs" />

@@ -28,14 +28,14 @@ namespace SimpleCQRS.Domain
                 throw new ArgumentNullException("email");
             }
                 
-            this.ApplyChange(new AttendeeEmailChanged(this.Id, Guid.NewGuid(), email.Trim()));
+            this.ApplyChange(new AttendeeEmailChanged(_id, Guid.NewGuid(), email.Trim()));
         }
 
         public void ConfirmChangeEmail(Guid confirmationId) 
         {
             if (confirmationId == this._confirmationId) 
             {
-                this.ApplyChange(new AttendeeChangeEmailConfirmed(this.Id, confirmationId, this._unconfirmedEmail));
+                this.ApplyChange(new AttendeeChangeEmailConfirmed(_id, confirmationId, this._unconfirmedEmail));
             }
 
             throw new ArgumentException("confirmation Id does not match.", "confirmationId");
@@ -45,12 +45,12 @@ namespace SimpleCQRS.Domain
         {
             if (_isUnregistered) throw new InvalidOperationException("Attendee is already unregistered.");
 
-            this.ApplyChange(new AttendeeUnregistered(this.Id, reason));
+            this.ApplyChange(new AttendeeUnregistered(_id, reason));
         }
 
         private void Apply(AttendeeRegistered @event) 
         {
-            this.Id = @event.Id;
+            _id = @event.Id;
         }
 
         private void Apply(AttendeeEmailChanged @event) 
