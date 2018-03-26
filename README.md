@@ -32,7 +32,7 @@ The basic workflow is as follows:
 1. Command is received by Web API
 2. The command is sent through a simple message bus implementation and is processed by a handler
 3. The handler receives the command and makes the necessary state changes through the domain model
-4. The repository persists the changes throug an event store implementation
+4. The repository persists the changes through an event store implementation
 5. If the event store successfully persists the new event(s), it then sends the event(s) to an Azure Service Bus Queue
-6. The worker role receives the message and processes it by sendig the events to their appropriate event handlers
+6. The worker role receives the message and processes it by sending the events to their appropriate event handlers
 7. The event handlers process the event(s) where typically a read model is created or updated
